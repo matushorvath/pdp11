@@ -9,6 +9,11 @@ Swap panic
 
 https://www.retro11.de/ouxr/211bsd/usr/src/sys/sys/init_main.c.html  
 
+SIMH Boot
+=========
+
+http://www.vaxman.de/publications/bsd211_inst.pdf  
+
 
 Misc
 ====
