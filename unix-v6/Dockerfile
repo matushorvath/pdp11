@@ -20,7 +20,7 @@ FROM base
 RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
-COPY Unix-v6-Ken-Wellsch.tap unix-v6.tap
+COPY unix-v6.tap .
 COPY simh.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
