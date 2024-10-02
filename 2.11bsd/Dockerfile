@@ -20,8 +20,8 @@ FROM base
 RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
-COPY unix-v6.tap .
-#COPY bsd.tap unix-v6.tap
+#COPY tape/bsd.tap .
+COPY 2.11BSD-481-simh-dist.tap bsd.tap
 COPY simh.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
