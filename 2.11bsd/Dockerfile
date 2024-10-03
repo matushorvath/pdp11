@@ -23,7 +23,7 @@ RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
 COPY 2.11bsd.tap .
-COPY inst-1.ini .
+COPY simh/inst-1.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 
@@ -36,7 +36,7 @@ RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
 COPY 2.11bsd.tap .
-COPY inst-2.ini .
+COPY simh/inst-2.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 COPY --from=inst-1 /opt/pdp11/rq0.dsk .
@@ -49,7 +49,7 @@ FROM base AS run
 RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
-COPY run.ini .
+COPY simh/run.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 COPY --from=inst-2 /opt/pdp11/rq0.dsk .

@@ -26,4 +26,4 @@ COPY simh.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 
-CMD ["./pdp11", "simh.ini"]
+CMD ["./pdp11"]
