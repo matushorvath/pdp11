@@ -28,7 +28,6 @@ COPY inst-1.ini .
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 
 RUN ./pdp11 inst-1.ini
-#CMD ["./pdp11", "inst-1.ini"]
 
 # Install stage 2
 FROM base AS inst-2
@@ -42,17 +41,17 @@ COPY inst-2.ini .
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 COPY --from=inst-1 /opt/pdp11/rq0.dsk .
 
-CMD ["./pdp11", "inst-2.ini"]
+RUN ./pdp11 inst-2.ini
 
 # Run
-# FROM base
+FROM base AS run
 
-# RUN mkdir -p /opt/pdp11
-# WORKDIR /opt/pdp11
+RUN mkdir -p /opt/pdp11
+WORKDIR /opt/pdp11
 
-# COPY run.ini .
+COPY run.ini .
 
-# COPY --from=build /usr/src/simh/BIN/pdp11 .
-# COPY --from=inst-1 /opt/pdp11/rq0.dsk .
+COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=inst-2 /opt/pdp11/rq0.dsk .
 
-# CMD ["./pdp11", "run.ini"]
+CMD ["./pdp11", "run.ini"]
