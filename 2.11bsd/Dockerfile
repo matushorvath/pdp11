@@ -51,21 +51,23 @@ RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
 COPY simh/inst-3.ini .
+COPY data.tar .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 COPY --from=inst-2 /opt/pdp11/rq0.dsk .
 
-RUN ./pdp11 inst-3.ini
+#RUN ./pdp11 inst-3.ini
+CMD ["./pdp11", "inst-3.ini"]
 
 # Run
-FROM base AS run
+# FROM base AS run
 
-RUN mkdir -p /opt/pdp11
-WORKDIR /opt/pdp11
+# RUN mkdir -p /opt/pdp11
+# WORKDIR /opt/pdp11
 
-COPY simh/run.ini .
+# COPY simh/run.ini .
 
-COPY --from=build /usr/src/simh/BIN/pdp11 .
-COPY --from=inst-3 /opt/pdp11/rq0.dsk .
+# COPY --from=build /usr/src/simh/BIN/pdp11 .
+# COPY --from=inst-3 /opt/pdp11/rq0.dsk .
 
-CMD ["./pdp11", "run.ini"]
+# CMD ["./pdp11", "run.ini"]
