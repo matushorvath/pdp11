@@ -21,8 +21,9 @@ RUN mkdir -p /opt/pdp11
 WORKDIR /opt/pdp11
 
 COPY unix-v6.tap .
+#COPY bsd.tap unix-v6.tap
 COPY simh.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
 
-CMD ["./pdp11", "simh.ini"]
+CMD ["./pdp11"]
