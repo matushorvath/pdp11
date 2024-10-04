@@ -49,11 +49,11 @@ MAXUSERS	8			# maxusers on machine
 
 # BOOTDEV is the letter combination denoting the autoboot device,
 # or NONE if not using the autoboot feature.
-BOOTDEV		NONE			# don't autoboot
+#BOOTDEV	NONE			# don't autoboot
 #BOOTDEV	dvhp			# DIVA Comp/V boot device
 #BOOTDEV	hk6			# rk06 boot device
 #BOOTDEV	hk7			# rk07 boot device
-#BOOTDEV	ra			# MSCP boot device
+BOOTDEV		ra			# MSCP boot device
 #BOOTDEV	rk			# rk05 boot device
 #BOOTDEV	rl			# rl01/02 boot device
 #BOOTDEV	rm			# rm02/03/05 rp06 boot device
@@ -74,9 +74,9 @@ TIMEZONE	0			# kernel uses GMT by default
 # which correspond to the partitions as described in the section 4 manual
 # pages.  You can also get the major numbers from the MAKEDEV script in
 # /dev.
-PIPEDEV		makedev(10,0)		# makedev(10,0) xp0a
-ROOTDEV		makedev(10,0)		# makedev(10,0) xp0a
-SWAPDEV		makedev(10,1)		# makedev(10,1) xp0b
+PIPEDEV		makedev(5,0)		# makedev(5,0) ra0a
+ROOTDEV		makedev(5,0)		# makedev(5,0) ra0a
+SWAPDEV		makedev(5,1)		# makedev(5,1) ra0b
 
 # DUMPROUTINE indicates which dump routine should be used.  DUMPDEV
 # should be in terms of makedev.  If DUMPDEV is NODEV no automatic
