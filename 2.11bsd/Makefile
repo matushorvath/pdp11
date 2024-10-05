@@ -12,7 +12,7 @@ data.tar: data/Makefile.patch data/SIMH data/fstab data/rc.patch
 	tar cvf $@ $^
 
 run:
-	docker run -it -p 2121:21/tcp matushorvath/2.11bsd
+	docker run -it -p 8080:80/tcp matushorvath/2.11bsd
 
 clean:
 	rm -f data.tar
