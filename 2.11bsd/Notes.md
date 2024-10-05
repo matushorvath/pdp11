@@ -29,6 +29,9 @@ TODO
 - hostname and domain as input parameters
 - timezone as input parameter
 - root password as input parameter, or generated and exposed
+- USER not root
+- HEALTHCHECK for httpd
+- use alpine as base image
 
 Networking
 ==========
