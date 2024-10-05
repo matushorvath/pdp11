@@ -25,6 +25,28 @@ https://manpath.be/bsd211
 TODO
 ====
 
-- hostname as input parameter
+- hostname and domain as input parameters
 - timezone as input parameter
 - root password as input parameter, or generated and exposed
+
+Networking
+==========
+
+NAT args:
+NAT network setup:
+        gateway       =10.0.2.2/24(255.255.255.0)
+        DNS           =10.0.2.3
+        dhcp_start    =10.0.2.15
+
+ATTACH XQ NAT:tcp=2323:10.0.2.15:23,tcp=2121:10.0.2.15:21
+
+set xq enabled
+attach xq0 nat:gateway=10.0.0.1/24,dns=10.0.0.2/24
+
+show xq
+show xq eth
+
+ifconfig qe0 inet netmask 255.255.255.0 10.0.2.100 broadcast 127.255.255.255 up -trailers
+route delete default 127.0.0.1
+route add default 10.0.2.2 1
+netstat -rn
