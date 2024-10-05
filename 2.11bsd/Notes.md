@@ -26,5 +26,5 @@ TODO
 ====
 
 - hostname as input parameter
-- time zone as input parameter
+- timezone as input parameter
 - root password as input parameter, or generated and exposed
