@@ -1,2 +1,3 @@
 /dev/ra0a	/	ufs	rw		1	1
 /dev/ra0b	none	swap	sw		0	0
+/dev/ra0d	/usr	ufs	rw		1	2
