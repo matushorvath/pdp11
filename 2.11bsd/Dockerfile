@@ -71,6 +71,30 @@ COPY --from=install-3-kernel /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-4-config.ini
 
+# Install stage 5
+FROM base AS install-5-httpd
+
+RUN apt install -y build-essential git
+
+RUN mkdir -p /opt/pdp11
+WORKDIR /opt/pdp11
+
+COPY simh/install-5-httpd.ini .
+COPY data.tar .
+
+RUN git clone https://github.com/AaronJackson/2.11BSDhttpd.git httpd
+
+WORKDIR /opt/pdp11/httpd
+RUN git checkout 6ee71e5ed2a462f492543b372df3d631d70afd26
+
+WORKDIR /opt/pdp11
+RUN tar cvf httpd.tar httpd
+
+COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=install-4-config /opt/pdp11/rq0.dsk .
+
+RUN ./pdp11 install-5-httpd.ini
+
 # Run
 FROM base AS run
 
@@ -80,6 +104,6 @@ WORKDIR /opt/pdp11
 COPY simh/run.ini .
 
 COPY --from=build /usr/src/simh/BIN/pdp11 .
-COPY --from=install-4-config /opt/pdp11/rq0.dsk .
+COPY --from=install-5-httpd /opt/pdp11/rq0.dsk .
 
 CMD ["./pdp11", "run.ini"]
