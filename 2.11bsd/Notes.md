@@ -21,6 +21,7 @@ http://bsdimp.blogspot.com/2020/07/simh-setup-for-211bsd-restoration.html
 https://gunkies.org/wiki/2.11BSD  
 https://groups.google.com/g/pidp-11/c/K99hzmAMkic  
 https://manpath.be/bsd211  
+https://www.retrocmp.com/how-tos/installing-211bsd-unix-on-pdp-1144
 
 TODO
 ====
@@ -50,3 +51,15 @@ ifconfig qe0 inet netmask 255.255.255.0 10.0.2.100 broadcast 127.255.255.255 up 
 route delete default 127.0.0.1
 route add default 10.0.2.2 1
 netstat -rn
+
+Telnet
+======
+
+docker run -p 2121:21/tcp matushorvath/2.11bsd
+telnet localhost 2121
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+Connection closed by foreign host.
+
+(probably set up ptys?)
