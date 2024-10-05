@@ -8,7 +8,7 @@ build: 2.11bsd.tap data.tar
 2.11bsd.tap:
 	curl -sS -o $@ https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap
 
-data.tar: data/*
+data.tar: data/Makefile.patch data/SIMH data/fstab data/rc.patch
 	tar cvf $@ $^
 
 run:
