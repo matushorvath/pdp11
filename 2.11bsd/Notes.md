@@ -29,8 +29,6 @@ TODO
 - hostname and domain as input parameters
 - timezone as input parameter
 - root password as input parameter, or generated and exposed
-- build data.tar inside the docker, build a different one for every stage; or
-- read the data.tar tape just once, keep the files somewhere convenient, delete them once used
 
 Networking
 ==========
