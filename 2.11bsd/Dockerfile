@@ -99,8 +99,6 @@ RUN ./pdp11 install-4-config.ini
 # Install stage 5
 FROM base AS install-5-httpd
 
-EXPOSE 80/tcp
-
 USER 1000:1000
 WORKDIR /opt/pdp11
 
@@ -115,6 +113,14 @@ RUN ./pdp11 install-5-httpd.ini
 ####################
 # Run
 FROM base AS run
+
+EXPOSE 80/tcp
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl -f http://localhost/ || exit 1
 
 USER 1000:1000
 WORKDIR /opt/pdp11
