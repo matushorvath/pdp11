@@ -1,47 +1,49 @@
+####################
+# Base image
 FROM debian:12.7-slim AS base
 
-RUN apt update -y
-RUN apt install -y --no-install-recommends libpcre3 libedit2 libpcap0.8 libvdeplug2
+RUN <<EOT
+    apt-get update
+    apt-get install -y --no-install-recommends libpcre3 libedit2 libpcap0.8 libvdeplug2
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+EOT
 
-
+####################
 # Build open-simh
-FROM base AS build
+FROM base AS build-simh
 
-RUN apt install -y --no-install-recommends build-essential cmake cmake-data sudo
-RUN apt install -y --no-install-recommends pkg-config libpcre3-dev libedit-dev libpcap-dev libvdeplug-dev
+RUN <<EOT
+    apt-get update
+    apt-get install -y --no-install-recommends build-essential cmake cmake-data sudo \
+        pkg-config libpcre3-dev libedit-dev libpcap-dev libvdeplug-dev
+    apt-get clean
+    rm -rf /var/lib/apt/lists/*
+EOT
 
 WORKDIR /usr/src/simh
 ADD https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
 RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo
 
-
+####################
 # Prepare data
 FROM base AS prepare-data
 
 WORKDIR /data
 
-# 2.11BSD install tape
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 
-# httpd
 ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd
+RUN tar cvf httpd.tar httpd && rm -rf httpd
 
-RUN tar cvf httpd.tar httpd
-RUN rm -rf httpd
+COPY data/Makefile.patch misc/
+COPY data/SIMH misc/
+COPY data/fstab misc/
+COPY data/index.html misc/
+COPY data/rc.patch misc/
+RUN tar -cvf misc.tar misc && rm -rf misc
 
-# misc data
-RUN mkdir -p /data/misc
-
-COPY data/Makefile.patch misc
-COPY data/SIMH misc
-COPY data/fstab misc
-COPY data/index.html misc
-COPY data/rc.patch misc
-
-RUN tar -cvf misc.tar misc
-RUN rm -rf httpd
-
-
+####################
 # Install stage 1
 FROM base AS install-1-tape
 
@@ -49,11 +51,11 @@ WORKDIR /opt/pdp11
 
 COPY simh/install-1-tape.ini .
 COPY --from=prepare-data /data/2.11bsd.tap .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 
 RUN ./pdp11 install-1-tape.ini
 
-
+####################
 # Install stage 2
 FROM base AS install-2-file-system
 
@@ -62,12 +64,12 @@ WORKDIR /opt/pdp11
 COPY simh/install-2-file-system.ini .
 COPY --from=prepare-data /data/2.11bsd.tap .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-1-tape /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-2-file-system.ini
 
-
+####################
 # Install stage 3
 FROM base AS install-3-kernel
 
@@ -75,42 +77,40 @@ WORKDIR /opt/pdp11
 
 COPY simh/install-3-kernel.ini .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-2-file-system /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-3-kernel.ini
 
-
+####################
 # Install stage 4
 FROM base AS install-4-config
 
 WORKDIR /opt/pdp11
 
 COPY simh/install-4-config.ini .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-3-kernel /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-4-config.ini
 
-
+####################
 # Install stage 5
 FROM base AS install-5-httpd
 
 EXPOSE 80/tcp
-
-RUN apt install -y --no-install-recommends build-essential
 
 WORKDIR /opt/pdp11
 
 COPY simh/install-5-httpd.ini .
 COPY --from=prepare-data /data/httpd.tar .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-4-config /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-5-httpd.ini
 
-
+####################
 # Run
 FROM base AS run
 
@@ -118,7 +118,7 @@ WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
 
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-5-httpd /opt/pdp11/rq0.dsk .
 
 CMD ["./pdp11", "run.ini"]
