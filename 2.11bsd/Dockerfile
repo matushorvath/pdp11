@@ -1,135 +1,132 @@
+####################
+# Base image
 FROM debian:12.7-slim AS base
 
-RUN apt update -y
-RUN apt install -y libpcre3 libedit2 libpcap0.8 libvdeplug2
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libedit2 libpcap0.8 libpcre3 libvdeplug2 zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
+####################
+# Build Open SimH
+FROM base AS build-simh
 
-# Build open-simh
-FROM base AS build
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
+        libedit-dev libpcap-dev libpcre3-dev libvdeplug-dev pkg-config zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt install -y build-essential git cmake cmake-data sudo
-RUN apt install -y pkg-config libpcre3-dev libedit-dev libpcap-dev libvdeplug-dev
-
-WORKDIR /usr/src
-RUN git clone https://github.com/open-simh/simh.git
-
+USER 1000:1000
 WORKDIR /usr/src/simh
-RUN git checkout 36605c4950faf0c3a01f3d24040dfb5519bc0ae3
+
+ADD --chown=1000:1000 https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
 RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo
 
-
+####################
 # Prepare data
 FROM base AS prepare-data
 
-RUN apt install -y git curl
-
-RUN mkdir -p /data
+USER 1000:1000
 WORKDIR /data
 
-# 2.11BSD install tape
-RUN curl -sS -o 2.11bsd.tap https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap
+ADD --chown=1000:1000 https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 
-# httpd
-RUN git clone https://github.com/AaronJackson/2.11BSDhttpd.git httpd
-RUN git -C httpd checkout 6ee71e5ed2a462f492543b372df3d631d70afd26
+ADD --chown=1000:1000 https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd
+RUN tar cvf httpd.tar httpd && rm -rf httpd
 
-RUN tar cvf httpd.tar httpd
-RUN rm -rf httpd
+COPY --chown=1000:1000 data/Makefile.patch misc/
+COPY --chown=1000:1000 data/SIMH misc/
+COPY --chown=1000:1000 data/fstab misc/
+COPY --chown=1000:1000 data/index.html misc/
+COPY --chown=1000:1000 data/rc.patch misc/
+RUN tar -cvf misc.tar misc && rm -rf misc
 
-# misc data
-RUN mkdir -p /data/misc
-
-COPY data/Makefile.patch misc
-COPY data/SIMH misc
-COPY data/fstab misc
-COPY data/index.html misc
-COPY data/rc.patch misc
-
-RUN tar -cvf misc.tar misc
-RUN rm -rf httpd
-
-
+####################
 # Install stage 1
 FROM base AS install-1-tape
 
-RUN mkdir -p /opt/pdp11
+USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-1-tape.ini .
 COPY --from=prepare-data /data/2.11bsd.tap .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 
 RUN ./pdp11 install-1-tape.ini
 
-
+####################
 # Install stage 2
 FROM base AS install-2-file-system
 
-RUN mkdir -p /opt/pdp11
+USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-2-file-system.ini .
 COPY --from=prepare-data /data/2.11bsd.tap .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-1-tape /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-2-file-system.ini
 
-
+####################
 # Install stage 3
 FROM base AS install-3-kernel
 
-RUN mkdir -p /opt/pdp11
+USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-3-kernel.ini .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-2-file-system /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-3-kernel.ini
 
-
+####################
 # Install stage 4
 FROM base AS install-4-config
 
-RUN mkdir -p /opt/pdp11
+USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-4-config.ini .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-3-kernel /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-4-config.ini
 
-
+####################
 # Install stage 5
 FROM base AS install-5-httpd
 
-RUN apt install -y build-essential git
-
-RUN mkdir -p /opt/pdp11
+USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-5-httpd.ini .
 COPY --from=prepare-data /data/httpd.tar .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-4-config /opt/pdp11/rq0.dsk .
 
 RUN ./pdp11 install-5-httpd.ini
 
-
+####################
 # Run
 FROM base AS run
 
-RUN mkdir -p /opt/pdp11
+EXPOSE 80/tcp
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl -f http://localhost/ || exit 1
+
+USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
-
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-5-httpd /opt/pdp11/rq0.dsk .
 
 CMD ["./pdp11", "run.ini"]

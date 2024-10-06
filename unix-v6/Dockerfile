@@ -1,29 +1,35 @@
+####################
+# Base image
 FROM debian:12.7-slim AS base
 
-RUN apt update -y
-RUN apt install -y libpcre3 libedit2 libpcap0.8 libvdeplug2
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libedit2 libpcap0.8 libpcre3 libvdeplug2 zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
-FROM base AS build
+####################
+# Build Open SimH
+FROM base AS build-simh
 
-RUN apt install -y build-essential git cmake cmake-data sudo
-RUN apt install -y pkg-config libpcre3-dev libedit-dev libpcap-dev libvdeplug-dev
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
+        libedit-dev libpcap-dev libpcre3-dev libvdeplug-dev pkg-config zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /usr/src
-RUN git clone https://github.com/open-simh/simh.git
-
+USER 1000:1000
 WORKDIR /usr/src/simh
-RUN git checkout 36605c4950faf0c3a01f3d24040dfb5519bc0ae3
+
+ADD --chown=1000:1000 https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
 RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo
 
-FROM base
+####################
+# Run
+FROM base AS run
 
-RUN mkdir -p /opt/pdp11
+USER 1000:1000
 WORKDIR /opt/pdp11
 
-COPY unix-v6.tap .
-#COPY bsd.tap unix-v6.tap
 COPY simh.ini .
-
-COPY --from=build /usr/src/simh/BIN/pdp11 .
+ADD --chown=1000:1000 https://www.tuhs.org/Archive/Distributions/Other/OS_Course/v6/dist.tap .
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 
 CMD ["./pdp11"]
