@@ -2,24 +2,18 @@
 # Base image
 FROM debian:12.7-slim AS base
 
-RUN <<EOT
-    apt-get update
-    apt-get install -y --no-install-recommends libpcre3 libedit2 libpcap0.8 libvdeplug2
-    apt-get clean
-    rm -rf /var/lib/apt/lists/*
-EOT
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libedit2 libpcap0.8 libpcre3 libvdeplug2 zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
 ####################
-# Build open-simh
+# Build Open SimH
 FROM base AS build-simh
 
-RUN <<EOT
-    apt-get update
-    apt-get install -y --no-install-recommends build-essential cmake cmake-data sudo \
-        pkg-config libpcre3-dev libedit-dev libpcap-dev libvdeplug-dev
-    apt-get clean
-    rm -rf /var/lib/apt/lists/*
-EOT
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
+        libedit-dev libpcap-dev libpcre3-dev libvdeplug-dev pkg-config zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/simh
 ADD https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
@@ -117,7 +111,6 @@ FROM base AS run
 WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
-
 COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 COPY --from=install-5-httpd /opt/pdp11/rq0.dsk .
 

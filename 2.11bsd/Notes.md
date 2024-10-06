@@ -9,8 +9,8 @@ Swap panic
 
 https://www.retro11.de/ouxr/211bsd/usr/src/sys/sys/init_main.c.html  
 
-SIMH Boot
-=========
+Open SimH Boot
+==============
 
 http://www.vaxman.de/publications/bsd211_inst.pdf  
 
@@ -31,7 +31,6 @@ TODO
 - root password as input parameter, or generated and exposed
 - USER not root
 - HEALTHCHECK for httpd
-- use alpine as base image
 
 Networking
 ==========
