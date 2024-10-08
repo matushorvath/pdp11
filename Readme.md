@@ -19,6 +19,12 @@ A web server running on 2BSD:
 ### Try it out
 
 ```sh
+$ docker run -it -p 8080:80 matushorvath/2.11bsd
+```
+
+Or build your own image:
+
+```sh
 $ cd 2.11bsd
 $ docker build -t 2.11bsd .
 $ docker run -it -p 8080:80 2.11bsd
