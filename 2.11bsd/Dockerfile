@@ -1,114 +1,112 @@
 ####################
-# Base image
-FROM debian:12.7-slim AS base
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends libedit2 libpcap0.8 libpcre3 libvdeplug2 zlib1g \
-    && rm -rf /var/lib/apt/lists/*
-
-####################
 # Build Open SimH
-FROM base AS build-simh
+FROM debian:12.7-slim AS build-simh
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
-        libedit-dev libpcap-dev libpcre3-dev libvdeplug-dev pkg-config zlib1g-dev \
+    && apt-get install -y --no-install-recommends build-essential cmake cmake-data libedit2 libedit-dev \
+        libpcap0.8 libpcap-dev libpcre3 libpcre3-dev libvdeplug2 libvdeplug-dev pkg-config zlib1g zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-USER 1000:1000
 WORKDIR /usr/src/simh
 
-ADD --chown=1000:1000 https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
+ADD https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
 RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo
 
 ####################
 # Prepare data
-FROM base AS prepare-data
+FROM debian:12.7-slim AS prepare-data
 
-USER 1000:1000
 WORKDIR /data
 
-ADD --chown=1000:1000 https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 
-ADD --chown=1000:1000 https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd
+ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd
 RUN tar cvf httpd.tar httpd && rm -rf httpd
 
-COPY --chown=1000:1000 data/Makefile.patch misc/
-COPY --chown=1000:1000 data/SIMH misc/
-COPY --chown=1000:1000 data/fstab misc/
-COPY --chown=1000:1000 data/index.html misc/
-COPY --chown=1000:1000 data/rc.patch misc/
+COPY data/Makefile.patch misc/
+COPY data/SIMH misc/
+COPY data/fstab misc/
+COPY data/index.html misc/
+COPY data/rc.patch misc/
 RUN tar -cvf misc.tar misc && rm -rf misc
+
+ARG BUSYBOX_VERSION=1.35.0-x86_64-linux-musl
+ADD --chmod=755 https://busybox.net/downloads/binaries/$BUSYBOX_VERSION/busybox_WGET wget
+
+####################
+# Base image for Open SimH
+FROM gcr.io/distroless/base-nossl-debian12:nonroot AS base
+
+WORKDIR /opt/pdp11
+
+COPY --from=build-simh /lib/x86_64-linux-gnu/libvdeplug.so.2 /lib/x86_64-linux-gnu/
+COPY --from=build-simh /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/
+COPY --from=build-simh /lib/x86_64-linux-gnu/libedit.so.2 /lib/x86_64-linux-gnu/
+COPY --from=build-simh /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/
+COPY --from=build-simh /lib/x86_64-linux-gnu/libbsd.so.0 /lib/x86_64-linux-gnu/
+COPY --from=build-simh /lib/x86_64-linux-gnu/libmd.so.0 /lib/x86_64-linux-gnu/
+
+COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 
 ####################
 # Install stage 1
 FROM base AS install-1-tape
 
-USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-1-tape.ini .
-COPY --from=prepare-data /data/2.11bsd.tap .
-COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
+COPY --chown=nonroot:nonroot --from=prepare-data /data/2.11bsd.tap .
 
-RUN ./pdp11 install-1-tape.ini
+RUN ["./pdp11", "install-1-tape.ini"]
 
 ####################
 # Install stage 2
 FROM base AS install-2-file-system
 
-USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-2-file-system.ini .
-COPY --from=prepare-data /data/2.11bsd.tap .
+COPY --chown=nonroot:nonroot --from=prepare-data /data/2.11bsd.tap .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
-COPY --from=install-1-tape /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-1-tape /opt/pdp11/rq0.dsk .
 
-RUN ./pdp11 install-2-file-system.ini
+RUN ["./pdp11", "install-2-file-system.ini"]
 
 ####################
 # Install stage 3
 FROM base AS install-3-kernel
 
-USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-3-kernel.ini .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
-COPY --from=install-2-file-system /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-2-file-system /opt/pdp11/rq0.dsk .
 
-RUN ./pdp11 install-3-kernel.ini
+RUN ["./pdp11", "install-3-kernel.ini"]
 
 ####################
 # Install stage 4
 FROM base AS install-4-config
 
-USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-4-config.ini .
-COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
-COPY --from=install-3-kernel /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-3-kernel /opt/pdp11/rq0.dsk .
 
-RUN ./pdp11 install-4-config.ini
+RUN ["./pdp11", "install-4-config.ini"]
 
 ####################
 # Install stage 5
 FROM base AS install-5-httpd
 
-USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/install-5-httpd.ini .
 COPY --from=prepare-data /data/httpd.tar .
 COPY --from=prepare-data /data/misc.tar .
-COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
-COPY --from=install-4-config /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-4-config /opt/pdp11/rq0.dsk .
 
-RUN ./pdp11 install-5-httpd.ini
+RUN ["./pdp11", "install-5-httpd.ini"]
 
 ####################
 # Run
@@ -116,17 +114,13 @@ FROM base AS run
 
 EXPOSE 80/tcp
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
+COPY --from=prepare-data /data/wget /usr/bin/wget
 HEALTHCHECK --interval=30s --timeout=3s \
-    CMD curl -f http://localhost/ || exit 1
+    CMD ["/usr/bin/wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
 
-USER 1000:1000
 WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
-COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
-COPY --from=install-5-httpd /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-5-httpd /opt/pdp11/rq0.dsk .
 
-CMD ["./pdp11", "run.ini"]
+ENTRYPOINT ["./pdp11", "run.ini"]
