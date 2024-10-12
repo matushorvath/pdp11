@@ -20,6 +20,14 @@ WORKDIR /data
 
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482
+RUN mkdir -p patch \
+    && sed -n '89,182p' < 482 > patch/482.sh \
+    && sed -n '205,$p' < 482 > patch/482.patch \
+    && chmod a+x patch/482.sh \
+    && tar cvf patch.tar patch \
+    && rm -rf patch
+
 ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd
 RUN tar cvf httpd.tar httpd && rm -rf httpd
 
@@ -72,16 +80,17 @@ COPY --chown=nonroot:nonroot --from=install-tape /opt/pdp11/rq0.dsk .
 RUN ["./pdp11", "install-file-system.ini"]
 
 ####################
-# Rebuild the kernel
-FROM base AS install-kernel
+# Rebuild the system
+FROM base AS install-rebuild
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-kernel.ini .
+COPY simh/install-rebuild.ini .
 COPY --from=prepare-data /data/misc.tar .
+COPY --from=prepare-data /data/patch.tar .
 COPY --chown=nonroot:nonroot --from=install-file-system /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-kernel.ini"]
+RUN ["./pdp11", "install-rebuild.ini"]
 
 ####################
 # Configure the system
@@ -90,7 +99,7 @@ FROM base AS install-config
 WORKDIR /opt/pdp11
 
 COPY simh/install-config.ini .
-COPY --chown=nonroot:nonroot --from=install-kernel /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-rebuild /opt/pdp11/rq0.dsk .
 
 RUN ["./pdp11", "install-config.ini"]
 
