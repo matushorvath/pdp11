@@ -48,67 +48,67 @@ COPY --from=build-simh /lib/x86_64-linux-gnu/libmd.so.0 /lib/x86_64-linux-gnu/
 COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 
 ####################
-# Install stage 1
-FROM base AS install-1-tape
+# Load 2.11BSD root file system from tape
+FROM base AS install-tape
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-1-tape.ini .
+COPY simh/install-tape.ini .
 COPY --chown=nonroot:nonroot --from=prepare-data /data/2.11bsd.tap .
 
-RUN ["./pdp11", "install-1-tape.ini"]
+RUN ["./pdp11", "install-tape.ini"]
 
 ####################
-# Install stage 2
-FROM base AS install-2-file-system
+# Load rest of the file system from tape
+FROM base AS install-file-system
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-2-file-system.ini .
+COPY simh/install-file-system.ini .
 COPY --chown=nonroot:nonroot --from=prepare-data /data/2.11bsd.tap .
 COPY --from=prepare-data /data/misc.tar .
-COPY --chown=nonroot:nonroot --from=install-1-tape /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-tape /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-2-file-system.ini"]
+RUN ["./pdp11", "install-file-system.ini"]
 
 ####################
-# Install stage 3
-FROM base AS install-3-kernel
+# Rebuild the kernel
+FROM base AS install-kernel
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-3-kernel.ini .
+COPY simh/install-kernel.ini .
 COPY --from=prepare-data /data/misc.tar .
-COPY --chown=nonroot:nonroot --from=install-2-file-system /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-file-system /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-3-kernel.ini"]
+RUN ["./pdp11", "install-kernel.ini"]
 
 ####################
-# Install stage 4
-FROM base AS install-4-config
+# Configure the system
+FROM base AS install-config
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-4-config.ini .
-COPY --chown=nonroot:nonroot --from=install-3-kernel /opt/pdp11/rq0.dsk .
+COPY simh/install-config.ini .
+COPY --chown=nonroot:nonroot --from=install-kernel /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-4-config.ini"]
+RUN ["./pdp11", "install-config.ini"]
 
 ####################
-# Install stage 5
-FROM base AS install-5-httpd
+# Install and configure httpd
+FROM base AS install-httpd
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-5-httpd.ini .
+COPY simh/install-httpd.ini .
 COPY --from=prepare-data /data/httpd.tar .
 COPY --from=prepare-data /data/misc.tar .
-COPY --chown=nonroot:nonroot --from=install-4-config /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-config /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-5-httpd.ini"]
+RUN ["./pdp11", "install-httpd.ini"]
 
 ####################
-# Run
+# Run 2.11BSD with httpd
 FROM base AS run
 
 EXPOSE 80/tcp
@@ -120,6 +120,6 @@ HEALTHCHECK --interval=30s --timeout=3s \
 WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
-COPY --chown=nonroot:nonroot --from=install-5-httpd /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-httpd /opt/pdp11/rq0.dsk .
 
 ENTRYPOINT ["./pdp11", "run.ini"]
