@@ -20,10 +20,10 @@ WORKDIR /data
 
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482.txt
 RUN mkdir -p patch \
-    && sed -n '89,182p' < 482 > patch/482.sh \
-    && sed -n '205,$p' < 482 > patch/482.patch \
+    && sed -n '89,182p' < 482.txt > patch/482.sh \
+    && sed -n '205,$p' < 482.txt > patch/482.patch \
     && chmod a+x patch/482.sh \
     && tar cvf patch.tar patch \
     && rm -rf patch
