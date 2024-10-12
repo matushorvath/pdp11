@@ -20,6 +20,14 @@ WORKDIR /data
 
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482.txt
+RUN mkdir -p patch \
+    && sed -n '89,182p' < 482.txt > patch/482.sh \
+    && sed -n '205,$p' < 482.txt > patch/482.patch \
+    && chmod a+x patch/482.sh \
+    && tar cvf patch.tar patch \
+    && rm -rf patch
+
 ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd
 RUN tar cvf httpd.tar httpd && rm -rf httpd
 
@@ -48,67 +56,68 @@ COPY --from=build-simh /lib/x86_64-linux-gnu/libmd.so.0 /lib/x86_64-linux-gnu/
 COPY --from=build-simh /usr/src/simh/BIN/pdp11 .
 
 ####################
-# Install stage 1
-FROM base AS install-1-tape
+# Load 2.11BSD root file system from tape
+FROM base AS install-tape
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-1-tape.ini .
+COPY simh/install-tape.ini .
 COPY --chown=nonroot:nonroot --from=prepare-data /data/2.11bsd.tap .
 
-RUN ["./pdp11", "install-1-tape.ini"]
+RUN ["./pdp11", "install-tape.ini"]
 
 ####################
-# Install stage 2
-FROM base AS install-2-file-system
+# Load rest of the file system from tape
+FROM base AS install-file-system
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-2-file-system.ini .
+COPY simh/install-file-system.ini .
 COPY --chown=nonroot:nonroot --from=prepare-data /data/2.11bsd.tap .
 COPY --from=prepare-data /data/misc.tar .
-COPY --chown=nonroot:nonroot --from=install-1-tape /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-tape /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-2-file-system.ini"]
+RUN ["./pdp11", "install-file-system.ini"]
 
 ####################
-# Install stage 3
-FROM base AS install-3-kernel
+# Rebuild the system
+FROM base AS install-rebuild
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-3-kernel.ini .
+COPY simh/install-rebuild.ini .
 COPY --from=prepare-data /data/misc.tar .
-COPY --chown=nonroot:nonroot --from=install-2-file-system /opt/pdp11/rq0.dsk .
+COPY --from=prepare-data /data/patch.tar .
+COPY --chown=nonroot:nonroot --from=install-file-system /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-3-kernel.ini"]
+RUN ["./pdp11", "install-rebuild.ini"]
 
 ####################
-# Install stage 4
-FROM base AS install-4-config
+# Configure the system
+FROM base AS install-config
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-4-config.ini .
-COPY --chown=nonroot:nonroot --from=install-3-kernel /opt/pdp11/rq0.dsk .
+COPY simh/install-config.ini .
+COPY --chown=nonroot:nonroot --from=install-rebuild /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-4-config.ini"]
+RUN ["./pdp11", "install-config.ini"]
 
 ####################
-# Install stage 5
-FROM base AS install-5-httpd
+# Install and configure httpd
+FROM base AS install-httpd
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-5-httpd.ini .
+COPY simh/install-httpd.ini .
 COPY --from=prepare-data /data/httpd.tar .
 COPY --from=prepare-data /data/misc.tar .
-COPY --chown=nonroot:nonroot --from=install-4-config /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-config /opt/pdp11/rq0.dsk .
 
-RUN ["./pdp11", "install-5-httpd.ini"]
+RUN ["./pdp11", "install-httpd.ini"]
 
 ####################
-# Run
+# Run 2.11BSD with httpd
 FROM base AS run
 
 EXPOSE 80/tcp
@@ -120,6 +129,6 @@ HEALTHCHECK --interval=30s --timeout=3s \
 WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
-COPY --chown=nonroot:nonroot --from=install-5-httpd /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=install-httpd /opt/pdp11/rq0.dsk .
 
 ENTRYPOINT ["./pdp11", "run.ini"]
