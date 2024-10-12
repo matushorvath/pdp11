@@ -3,14 +3,14 @@
 FROM debian:12.7-slim AS build-simh
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential cmake cmake-data libedit2 libedit-dev \
-        libpcap0.8 libpcap-dev libpcre3 libpcre3-dev libvdeplug2 libvdeplug-dev pkg-config zlib1g zlib1g-dev \
+    && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
+        libedit2 libedit-dev libpcre3 libpcre3-dev pkg-config zlib1g zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/simh
 
 ADD https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
-RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo
+RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --notest
 
 ####################
 # Prepare data
@@ -39,7 +39,6 @@ FROM gcr.io/distroless/base-nossl-debian12:nonroot AS base
 
 WORKDIR /opt/pdp11
 
-COPY --from=build-simh /lib/x86_64-linux-gnu/libvdeplug.so.2 /lib/x86_64-linux-gnu/
 COPY --from=build-simh /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/
 COPY --from=build-simh /lib/x86_64-linux-gnu/libedit.so.2 /lib/x86_64-linux-gnu/
 COPY --from=build-simh /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/
