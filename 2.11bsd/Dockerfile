@@ -1,7 +1,7 @@
 # hadolint global ignore=DL3008
 
 ####################
-# Build Open SimH
+# Build DEC PDP11 on Open SimH
 FROM debian:12.7-slim AS build-pdp11
 
 RUN apt-get update \
@@ -12,7 +12,10 @@ RUN apt-get update \
 WORKDIR /usr/src/simh
 
 ADD https://github.com/open-simh/simh.git#36605c4950faf0c3a01f3d24040dfb5519bc0ae3 .
-RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --notest
+
+RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --notest \
+    && mkdir -p /opt/pdp11 \
+    && cp BIN/pdp11 /opt/pdp11/
 
 ####################
 # DEC PDP11 on Open SimH
@@ -31,74 +34,34 @@ COPY --from=build-pdp11 /usr/src/simh/BIN/pdp11 .
 ENTRYPOINT ["./pdp11"]
 
 ####################
-# Prepare data tapes
-FROM debian:12.7-slim AS tapes
+# Build DEC PDP11 with 2.11BSD on Open SimH
+FROM build-pdp11 AS build-pdp11-2.11bsd
 
-WORKDIR /tapes
+WORKDIR /opt/pdp11
 
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482.txt
 
-COPY data/Makefile.patch 2.11bsd-data/
-COPY data/SIMH 2.11bsd-data/
-COPY data/fstab 2.11bsd-data/
-COPY data/rc.patch 2.11bsd-data/
+COPY data/Makefile.patch data/
+COPY data/SIMH data/
+COPY data/fstab data/
+COPY data/rc.patch data/
 
-ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 httpd-data/httpd
-COPY data/index.html httpd-data/
-
-RUN sed -n '89,182p' < 482.txt > 2.11bsd-data/482.sh \
-    && sed -n '205,$p' < 482.txt > 2.11bsd-data/482.patch \
-    && chmod a+x 2.11bsd-data/482.sh \
-    && tar cvf 2.11bsd-data.tar 2.11bsd-data \
-    && tar cvf httpd-data.tar httpd-data \
-    && rm -rf 2.11bsd-data httpd-data
-
-####################
-# Load 2.11BSD root file system from tape
-FROM pdp11 AS build-pdp11-2.11bsd-tape
-
-WORKDIR /opt/pdp11
+RUN sed -n '89,182p' < 482.txt > data/482.sh \
+    && sed -n '205,$p' < 482.txt > data/482.patch \
+    && chmod a+x data/482.sh \
+    && tar cvf data.tar data
 
 COPY simh/install-tape.ini .
-COPY --chown=nonroot:nonroot --from=tapes /tapes/2.11bsd.tap .
-
 RUN ["./pdp11", "install-tape.ini"]
 
-####################
-# Load rest of the file system from tape
-FROM pdp11 AS build-pdp11-2.11bsd-file-system
-
-WORKDIR /opt/pdp11
-
 COPY simh/install-file-system.ini .
-COPY --chown=nonroot:nonroot --from=tapes /tapes/2.11bsd.tap .
-COPY --from=tapes /tapes/2.11bsd-data.tar .
-COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-tape /opt/pdp11/rq0.dsk .
-
 RUN ["./pdp11", "install-file-system.ini"]
 
-####################
-# Rebuild the system
-FROM pdp11 AS build-pdp11-2.11bsd-rebuild
-
-WORKDIR /opt/pdp11
-
 COPY simh/install-rebuild.ini .
-COPY --from=tapes /tapes/2.11bsd-data.tar .
-COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-file-system /opt/pdp11/rq0.dsk .
-
 RUN ["./pdp11", "install-rebuild.ini"]
 
-####################
-# Configure the system
-FROM pdp11 AS build-pdp11-2.11bsd-config
-
-WORKDIR /opt/pdp11
-
 COPY simh/install-config.ini .
-COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-rebuild /opt/pdp11/rq0.dsk .
-
 RUN ["./pdp11", "install-config.ini"]
 
 ####################
@@ -108,20 +71,22 @@ FROM pdp11 AS pdp11-2.11bsd
 WORKDIR /opt/pdp11
 
 COPY simh/run.ini .
-COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-config /opt/pdp11/rq0.dsk .
+COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd /opt/pdp11/rq0.dsk .
 
 ENTRYPOINT ["./pdp11", "run.ini"]
 
 ####################
-# Install and configure httpd
-FROM pdp11 AS build-pdp11-2.11bsd-httpd
+# Build DEC PDP11 with 2.11BSD and httpd on Open SimH
+FROM build-pdp11-2.11bsd AS build-pdp11-2.11bsd-httpd
 
 WORKDIR /opt/pdp11
 
-COPY simh/install-httpd.ini .
-COPY --from=tapes /tapes/httpd-data.tar .
-COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-config /opt/pdp11/rq0.dsk .
+ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 data/httpd
+COPY data/index.html data/
 
+RUN tar cvf data.tar data
+
+COPY simh/install-httpd.ini .
 RUN ["./pdp11", "install-httpd.ini"]
 
 ####################
