@@ -70,10 +70,10 @@ FROM pdp11 AS pdp11-2.11bsd
 
 WORKDIR /opt/pdp11
 
-COPY simh/run.ini .
+COPY simh/run-pdp11.ini .
 COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd /opt/pdp11/rq0.dsk .
 
-ENTRYPOINT ["./pdp11", "run.ini"]
+ENTRYPOINT ["./pdp11", "run-pdp11.ini"]
 
 ####################
 # Build DEC PDP11 with 2.11BSD and httpd on Open SimH
@@ -103,7 +103,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 
 WORKDIR /opt/pdp11
 
-COPY simh/run.ini .
+COPY simh/run-pdp11-httpd.ini .
 COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-httpd /opt/pdp11/rq0.dsk .
 
-ENTRYPOINT ["./pdp11", "run.ini"]
+ENTRYPOINT ["./pdp11", "run-pdp11-httpd.ini"]
