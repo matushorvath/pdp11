@@ -63,3 +63,29 @@ Escape character is '^]'.
 Connection closed by foreign host.
 
 (probably set up ptys?)
+
+New Structure
+=============
+
+pdp11:<sha>
+pdp11:v1
+pdp11:latest
+
+pdp11-unix-v6:<sha>
+pdp11-unix-v6:v1
+pdp11-unix-v6:latest
+
+pdp11-2.11bsd:<sha>
+pdp11-2.11bsd:patch-482.v1
+pdp11-2.11bsd:patch-482
+pdp11-2.11bsd:latest
+
+pdp11-2.11bsd-httpd:<sha>
+pdp11-2.11bsd-httpd:patch-482.v1
+pdp11-2.11bsd-httpd:patch-482
+pdp11-2.11bsd-httpd:latest
+
+pdp11-2.11bsd-gcc:<sha>
+pdp11-2.11bsd-gcc:patch-482.v1
+pdp11-2.11bsd-gcc:patch-482
+pdp11-2.11bsd-gcc:latest
