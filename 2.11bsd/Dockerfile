@@ -2,7 +2,7 @@
 
 ####################
 # Build DEC PDP11 on Open SimH
-FROM debian:12.7-slim AS build-pdp11
+FROM debian:12.8-slim AS build-pdp11
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
