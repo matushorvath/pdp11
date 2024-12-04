@@ -7,7 +7,7 @@ build:
 	docker build -t matushorvath/pdp11-2.11bsd-httpd --target pdp11-2.11bsd-httpd .
 
 run:
-	docker run -it -p 8080:80/tcp pdp11-2.11bsd-httpd
+	docker run -it -p 8080:80/tcp matushorvath/pdp11-2.11bsd-httpd
 
 define publish-image
 	docker image tag $(PDP11_IMAGE) $(PDP11_IMAGE):v$(PDP11_VERSION)
