@@ -1,6 +1,6 @@
 ####################
 # Build Open SimH
-FROM debian:12.9-slim AS build-simh
+FROM debian:12.10-slim AS build-simh
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
