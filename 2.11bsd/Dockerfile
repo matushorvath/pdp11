@@ -79,6 +79,12 @@ ENTRYPOINT ["./pdp11", "run-pdp11.ini"]
 # Build DEC PDP11 with 2.11BSD and httpd on Open SimH
 FROM build-pdp11-2.11bsd AS build-pdp11-2.11bsd-httpd
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends busybox \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /bin/busybox /usr/bin/wget
+
 WORKDIR /opt/pdp11
 
 ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 data/httpd
@@ -95,11 +101,11 @@ FROM pdp11 AS pdp11-2.11bsd-httpd
 
 EXPOSE 80/tcp
 
-ARG BUSYBOX_VERSION=1.35.0-x86_64-linux-musl
-ADD --chmod=755 https://busybox.net/downloads/binaries/$BUSYBOX_VERSION/busybox_WGET /usr/bin/wget
+COPY --from=build-pdp11-2.11bsd-httpd /bin/busybox /bin/busybox
+COPY --from=build-pdp11-2.11bsd-httpd /usr/bin/wget /usr/bin/wget
 
 HEALTHCHECK --interval=30s --timeout=3s \
-    CMD ["/usr/bin/wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/"]
+    CMD ["/usr/bin/wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1/"]
 
 WORKDIR /opt/pdp11
 
