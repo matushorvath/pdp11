@@ -41,6 +41,8 @@ WORKDIR /opt/pdp11
 
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/483 483.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/484 484.txt
 
 COPY data/Makefile.patch data/
 COPY data/SIMH data/
@@ -49,7 +51,13 @@ COPY data/rc.patch data/
 
 RUN sed -n '89,182p' < 482.txt > data/482.sh \
     && sed -n '205,$p' < 482.txt > data/482.patch \
-    && chmod a+x data/482.sh \
+    && printf '#!/bin/sh -v\n\n' > data/483.sh \
+    && sed -n '94,106p' < 483.txt >> data/483.sh \
+    && sed -n '119,$p' < 483.txt > data/483.patch \
+    && printf '#!/bin/sh -v\n\n' > data/484.sh \
+    && sed -n '169,230p' < 484.txt >> data/484.sh \
+    && sed -n '237,$p' < 484.txt > data/484.patch \
+    && chmod a+x data/*.sh \
     && tar cvf data.tar data
 
 COPY simh/install-tape.ini .
