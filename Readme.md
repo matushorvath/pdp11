@@ -1,15 +1,15 @@
 UNIX on Emulated PDP11 in Docker
 ================================
 
-2.11BSD Patch 481
------------------
+2.11BSD
+-------
 
-A web server running on 2BSD:
+A web server running on a recent version of 2BSD:
  - DEC [PDP-11/93](https://gunkies.org/wiki/PDP-11/93) with 4 MB of memory
    and 456 MB [RA81](https://gunkies.org/wiki/RA81_Disk_Drive) disk drive
  - emulated by [Open SimH 4.x](https://github.com/open-simh/simh.git)
- - running [2.11BSD patch 481](https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481)
-   (released in 2023), installed from tape during container build
+ - running [2.11BSD](https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481)
+   installed from tape during container build and patched to a recent version
  - full internet connectivity using a DEC 
    [DELQA](https://gunkies.org/wiki/DIGITAL_Ethernet_Local-Area-Network_to_Q-bus_Adapter)
    ethernet adapter
@@ -40,4 +40,4 @@ UNIX v6
 -------
 
 [Ancient UNIX](https://www.tuhs.org/Archive/Distributions/Other/OS_Course/v6/)
-in a container, installed from tape while building.
+in a container, installed from tape during container build.
