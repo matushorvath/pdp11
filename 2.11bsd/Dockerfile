@@ -46,6 +46,9 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/484 484.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/485 485.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/486 486.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/487 487.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/488 488.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/489 489.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/490 490.txt
 
 COPY data/Makefile.patch data/
 COPY data/SIMH data/
@@ -69,6 +72,16 @@ RUN sed -n '89,182p' < 482.txt > data/482.sh \
     && printf '#!/bin/sh -v\n\n' > data/487.sh \
     && sed -n '121,150p' < 487.txt >> data/487.sh \
     && sed -n '161,$p' < 487.txt > data/487.patch \
+    && printf '#!/bin/sh -v\n\n' > data/488.sh \
+    && sed -n '102,104p' < 488.txt >> data/488.sh \
+    && sed -n '113,141p' < 488.txt >> data/488.sh \
+    && sed -n '152,$p' < 488.txt > data/488.patch \
+    && printf '#!/bin/sh -v\n\n' > data/489.sh \
+    && sed -n '96,124p' < 489.txt >> data/489.sh \
+    && sed -n '137,$p' < 489.txt > data/489.patch \
+    && printf '#!/bin/sh -v\n\n' > data/490.sh \
+    && sed -n '80,83p' < 490.txt >> data/490.sh \
+    && sed -n '94,$p' < 490.txt > data/490.patch \
     && chmod a+x data/*.sh \
     && tar cvf data.tar data
 
