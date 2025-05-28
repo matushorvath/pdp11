@@ -18,7 +18,7 @@ define publish-image
 	docker image push $(PDP11_IMAGE):latest
 endef
 
-publish:
+publish: build
 	[ ! -z "$(PDP11_VERSION)" ] || ( echo PDP11_VERSION variable needs to be set >&2 ; exit 1 )
 
 	$(eval PDP11_IMAGE = matushorvath/pdp11)
