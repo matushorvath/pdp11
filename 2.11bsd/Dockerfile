@@ -20,7 +20,7 @@ RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --notest \
 
 ####################
 # DEC PDP11 on Open SimH
-FROM gcr.io/distroless/base-nossl-debian12:nonroot AS pdp11
+FROM gcr.io/distroless/base-nossl-debian13:nonroot AS pdp11
 
 WORKDIR /opt/pdp11
 
