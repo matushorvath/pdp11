@@ -14,7 +14,7 @@ RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --nonetwork --
 
 ####################
 # Run
-FROM gcr.io/distroless/base-nossl-debian12:nonroot
+FROM gcr.io/distroless/base-nossl-debian13:nonroot
 
 WORKDIR /opt/pdp11
 
