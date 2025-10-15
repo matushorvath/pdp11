@@ -50,40 +50,21 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/487 487.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/488 488.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/489 489.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/490 490.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/491 491.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/492 492.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/494 494.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/495 495.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/496 496.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/497 497.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/498 498.txt
 
 COPY data/Makefile.patch data/
 COPY data/SIMH data/
 COPY data/fstab data/
 COPY data/rc.patch data/
+COPY data/parse-patches.sh .
 
-RUN sed -n '89,182p' < 482.txt > data/482.sh \
-    && sed -n '205,$p' < 482.txt > data/482.patch \
-    && printf '#!/bin/sh -v\n\n' > data/483.sh \
-    && sed -n '94,106p' < 483.txt >> data/483.sh \
-    && sed -n '119,$p' < 483.txt > data/483.patch \
-    && printf '#!/bin/sh -v\n\n' > data/484.sh \
-    && sed -n '169,230p' < 484.txt >> data/484.sh \
-    && sed -n '237,$p' < 484.txt > data/484.patch \
-    && printf '#!/bin/sh -v\n\n' > data/485.sh \
-    && sed -n '29,31p' < 485.txt >> data/485.sh \
-    && sed -n '46,$p' < 485.txt > data/485.patch \
-    && printf '#!/bin/sh -v\n\n' > data/486.sh \
-    && sed -n '164,166p' < 486.txt >> data/486.sh \
-    && sed -n '181,$p' < 486.txt > data/486.patch \
-    && printf '#!/bin/sh -v\n\n' > data/487.sh \
-    && sed -n '121,150p' < 487.txt >> data/487.sh \
-    && sed -n '161,$p' < 487.txt > data/487.patch \
-    && printf '#!/bin/sh -v\n\n' > data/488.sh \
-    && sed -n '102,104p' < 488.txt >> data/488.sh \
-    && sed -n '113,141p' < 488.txt >> data/488.sh \
-    && sed -n '152,$p' < 488.txt > data/488.patch \
-    && printf '#!/bin/sh -v\n\n' > data/489.sh \
-    && sed -n '96,124p' < 489.txt >> data/489.sh \
-    && sed -n '137,$p' < 489.txt > data/489.patch \
-    && printf '#!/bin/sh -v\n\n' > data/490.sh \
-    && sed -n '80,83p' < 490.txt >> data/490.sh \
-    && sed -n '94,$p' < 490.txt > data/490.patch \
-    && chmod a+x data/*.sh \
+RUN ./parse-patches.sh \
     && tar cvf data.tar data
 
 COPY simh/install-tape.ini .
