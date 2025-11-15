@@ -1,3 +1,8 @@
+[![Build](https://github.com/matushorvath/pdp11/actions/workflows/build.yml/badge.svg)](https://github.com/matushorvath/pdp11/actions/workflows/build.yml)
+[![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11?logo=docker&label=pdp11)](https://hub.docker.com/repository/docker/matushorvath/pdp11)
+[![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11-2.11bsd?logo=docker&label=pdp11-2.11bsd)](https://hub.docker.com/repository/docker/matushorvath/pdp11-2.11bsd)
+[![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11-2.11bsd-httpd?logo=docker&label=pdp11-2.11bsd-httpd)](https://hub.docker.com/repository/docker/matushorvath/pdp11-2.11bsd-httpd)
+
 UNIX on Emulated PDP11 in Docker
 ================================
 
