@@ -46,3 +46,8 @@ UNIX v6
 
 [Ancient UNIX](https://www.tuhs.org/Archive/Distributions/Other/OS_Course/v6/)
 in a container, installed from tape during container build.
+
+Publishing Docker
+-----------------
+
+GitHub Actions setup: https://docs.docker.com/guides/reactjs/configure-github-actions
