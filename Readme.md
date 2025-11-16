@@ -46,3 +46,19 @@ UNIX v6
 
 [Ancient UNIX](https://www.tuhs.org/Archive/Distributions/Other/OS_Course/v6/)
 in a container, installed from tape during container build.
+
+Publishing
+----------
+
+1. Prepare the release in the `main` branch
+1. Tag the commit with the version number:
+   ```sh
+   $ git tag v0.1.0 main
+   ```
+1. Push the tag to GitHub:
+   ```sh
+   $ git push origin tag v0.1.0
+   ```
+1. GitHub Actions will publish docker images to Docker Hub
+
+GitHub Actions setup: https://docs.docker.com/guides/reactjs/configure-github-actions
