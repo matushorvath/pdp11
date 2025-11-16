@@ -1,8 +1,8 @@
 [![2.11BSD](https://github.com/matushorvath/pdp11/actions/workflows/build-2.11bsd.yml/badge.svg)](https://github.com/matushorvath/pdp11/actions/workflows/build-2.11bsd.yml)
-[![Unix v6](https://github.com/matushorvath/pdp11/actions/workflows/build-unix-v6.yml/badge.svg)](https://github.com/matushorvath/pdp11/actions/workflows/build-unix-v6.yml)
 [![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11?logo=docker&label=pdp11)](https://hub.docker.com/repository/docker/matushorvath/pdp11)
 [![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11-2.11bsd?logo=docker&label=pdp11-2.11bsd)](https://hub.docker.com/repository/docker/matushorvath/pdp11-2.11bsd)
-[![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11-2.11bsd-httpd?logo=docker&label=pdp11-2.11bsd-httpd)](https://hub.docker.com/repository/docker/matushorvath/pdp11-2.11bsd-httpd)
+[![Docker Image Version](https://img.shields.io/docker/v/matushorvath/pdp11-2.11bsd-httpd?logo=docker&label=pdp11-2.11bsd-httpd)](https://hub.docker.com/repository/docker/matushorvath/pdp11-2.11bsd-httpd)  
+[![Unix v6](https://github.com/matushorvath/pdp11/actions/workflows/build-unix-v6.yml/badge.svg)](https://github.com/matushorvath/pdp11/actions/workflows/build-unix-v6.yml)
 [![Docker Image Version](https://img.shields.io/docker/v/matushorvath/unix-v6?logo=docker&label=unix-v6)](https://hub.docker.com/repository/docker/matushorvath/unix-v6)
 
 UNIX on Emulated PDP11 in Docker
