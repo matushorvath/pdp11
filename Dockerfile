@@ -30,7 +30,18 @@ COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gn
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libbsd.so.0 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libmd.so.0 /lib/x86_64-linux-gnu/
 
-COPY --from=build-pdp11 /usr/src/simh/BIN/pdp11 .
+COPY --from=build-pdp11 /opt/pdp11/pdp11 .
+
+ENTRYPOINT ["./pdp11"]
+
+####################
+# DEC PDP11 with UNIX v6 on Open SimH
+FROM pdp11 AS pdp11-unix-v6
+
+WORKDIR /opt/pdp11
+
+COPY unix-v6/simh.ini .
+ADD --chown=nonroot:nonroot https://www.tuhs.org/Archive/Distributions/Other/OS_Course/v6/dist.tap .
 
 ENTRYPOINT ["./pdp11"]
 
@@ -58,25 +69,25 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/496 496.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/497 497.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/498 498.txt
 
-COPY data/Makefile.patch data/
-COPY data/SIMH data/
-COPY data/fstab data/
-COPY data/rc.patch data/
-COPY data/parse-patches.sh .
+COPY 2.11bsd/data/Makefile.patch data/
+COPY 2.11bsd/data/SIMH data/
+COPY 2.11bsd/data/fstab data/
+COPY 2.11bsd/data/rc.patch data/
+COPY 2.11bsd/data/parse-patches.sh .
 
 RUN ./parse-patches.sh \
     && tar cvf data.tar data
 
-COPY simh/install-tape.ini .
+COPY 2.11bsd/simh/install-tape.ini .
 RUN ["./pdp11", "install-tape.ini"]
 
-COPY simh/install-file-system.ini .
+COPY 2.11bsd/simh/install-file-system.ini .
 RUN ["./pdp11", "install-file-system.ini"]
 
-COPY simh/install-rebuild.ini .
+COPY 2.11bsd/simh/install-rebuild.ini .
 RUN ["./pdp11", "install-rebuild.ini"]
 
-COPY simh/install-config.ini .
+COPY 2.11bsd/simh/install-config.ini .
 RUN ["./pdp11", "install-config.ini"]
 
 ####################
@@ -85,7 +96,7 @@ FROM pdp11 AS pdp11-2.11bsd
 
 WORKDIR /opt/pdp11
 
-COPY simh/run-pdp11.ini .
+COPY 2.11bsd/simh/run-pdp11.ini .
 COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd /opt/pdp11/rq0.dsk .
 
 ENTRYPOINT ["./pdp11", "run-pdp11.ini"]
@@ -103,11 +114,11 @@ RUN ln -s /bin/busybox /usr/bin/wget
 WORKDIR /opt/pdp11
 
 ADD https://github.com/AaronJackson/2.11BSDhttpd.git#6ee71e5ed2a462f492543b372df3d631d70afd26 data/httpd
-COPY data/index.html data/
+COPY 2.11bsd/data/index.html data/
 
 RUN tar cvf data.tar data
 
-COPY simh/install-httpd.ini .
+COPY 2.11bsd/simh/install-httpd.ini .
 RUN ["./pdp11", "install-httpd.ini"]
 
 ####################
@@ -124,7 +135,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 
 WORKDIR /opt/pdp11
 
-COPY simh/run-pdp11-httpd.ini .
+COPY 2.11bsd/simh/run-pdp11-httpd.ini .
 COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-httpd /opt/pdp11/rq0.dsk .
 
 ENTRYPOINT ["./pdp11", "run-pdp11-httpd.ini"]
