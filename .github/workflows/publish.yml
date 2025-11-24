@@ -13,6 +13,9 @@ jobs:
     name: Publish Images
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -48,7 +51,7 @@ jobs:
       - name: Push 2.11BSD
         uses: docker/build-push-action@v6
         with:
-          target: pdp11-211bsd
+          target: pdp11-2.11bsd
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd:latest
@@ -59,10 +62,21 @@ jobs:
       - name: Push 2.11BSD with HTTPD
         uses: docker/build-push-action@v6
         with:
-          target: pdp11-211bsd-httpd
+          target: pdp11-2.11bsd-httpd
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd-httpd:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd-httpd:${{ github.ref_name }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = "${{ github.ref_name }}" -Replace "^v", ""
+          gh release create "${{ github.ref_name }}" `
+            --title "Docker Images ${version}" `
+            --draft `
+            --generate-notes `
+            --verify-tag

@@ -5,3 +5,5 @@ Publish
 - Consider using releases:
   - Tag creates a release like in shadow-kvm
   - Publishing a release triggers actions to publish to GitHub
+- Add tests to verify the image works when building a PR
+- Consider building using docker/build-push-action@v6 as well

@@ -32,14 +32,14 @@ $ docker run -it -p 8080:80 matushorvath/pdp11-2.11bsd-httpd
 Or build your own image:
 
 ```sh
-$ cd 2.11bsd
-$ docker build -t 2.11bsd .
-$ docker run -it -p 8080:80 2.11bsd
+$ make 2.11bsd-httpd
+$ make run
 ```
 
 After you see the `login:` prompt, navigate your web browser to
 [http://localhost:8080](http://localhost:8080).
 You should see an "It works!" web page served by the PDP-11.
+You can also login as root without a password to get a shell.
 
 To shut down the server, either stop the docker, or log in as `root` (no password) and run `shutdown -h now`.
 
@@ -48,6 +48,15 @@ UNIX v6
 
 [Ancient UNIX](https://www.tuhs.org/Archive/Distributions/Other/OS_Course/v6/)
 in a container, installed from tape during container build.
+
+### Try it out
+
+```sh
+$ docker run -it -p 8080:80 matushorvath/pdp11-unix-v6
+```
+
+After you see the `login:` prompt, login as root without a password.
+To stop the system, press `Ctrl+E`, then type `quit` and press `Enter` (or stop the docker).
 
 Publishing
 ----------
