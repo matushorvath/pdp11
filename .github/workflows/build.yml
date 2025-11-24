@@ -12,12 +12,21 @@ on:
 
 jobs:
   build:
-    name: Build
+    name: Build Images
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Build Images
-        run: make
+      - name: Build PDP11
+        run: make pdp11
+
+      - name: Build Unix v6
+        run: make unix-v6
+
+      - name: Build 2.11BSD
+        run: make 2.11bsd
+
+      - name: Build 2.11BSD w/ httpd
+        run: make 2.11bsd-httpd
