@@ -1,6 +1,6 @@
 ####################
 # Build Open SimH
-FROM debian:13.1-slim AS build-simh
+FROM debian:13.2-slim AS build-simh
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
