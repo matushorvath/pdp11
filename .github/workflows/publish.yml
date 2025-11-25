@@ -78,7 +78,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ github.ref_name }}
         run: |
-          envsubst < docker-images.md > "$TEMP/docker-images.md"
+          notes=$(mktemp)
+          envsubst < docker-images.md > "$notes"
 
           version="${{ github.ref_name }}"
           version="${version#v}"
@@ -86,5 +87,5 @@ jobs:
             --title "Docker Images ${version}" \
             --draft \
             --generate-notes \
-            --notes-file "$TEMP/docker-images.md" \
+            --notes-file "$notes" \
             --verify-tag
