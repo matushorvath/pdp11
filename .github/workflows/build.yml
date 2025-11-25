@@ -22,6 +22,9 @@ jobs:
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Lint sources
+        run: make lint
+
       - name: Build PDP11
         uses: docker/build-push-action@v6
         with:
