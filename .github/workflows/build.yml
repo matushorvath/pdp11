@@ -19,14 +19,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build PDP11
-        run: make pdp11
+        uses: docker/build-push-action@v6
+        with:
+          target: pdp11
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build Unix v6
-        run: make unix-v6
+        uses: docker/build-push-action@v6
+        with:
+          target: pdp11-unix-v6
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build 2.11BSD
-        run: make 2.11bsd
+        uses: docker/build-push-action@v6
+        with:
+          target: pdp11-2.11bsd
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Build 2.11BSD w/ httpd
-        run: make 2.11bsd-httpd
+      - name: Build 2.11BSD with httpd
+        uses: docker/build-push-action@v6
+        with:
+          target: pdp11-2.11bsd-httpd
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
