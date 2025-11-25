@@ -20,6 +20,7 @@ unix-v6: pdp11
 
 .PHONY: lint
 lint:
+	yamllint .
 	docker run --rm -i hadolint/hadolint hadolint - < Dockerfile
 
 .PHONY: run
