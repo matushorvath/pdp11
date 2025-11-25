@@ -29,58 +29,62 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Push PDP11
-        uses: docker/build-push-action@v6
-        with:
-          target: pdp11
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11:${{ github.ref_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Push PDP11
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     target: pdp11
+      #     push: true
+      #     tags: |
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11:latest
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11:${{ github.ref_name }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
-      - name: Push Unix v6
-        uses: docker/build-push-action@v6
-        with:
-          target: pdp11-unix-v6
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-unix-v6:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-unix-v6:${{ github.ref_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Push Unix v6
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     target: pdp11-unix-v6
+      #     push: true
+      #     tags: |
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-unix-v6:latest
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-unix-v6:${{ github.ref_name }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
-      - name: Push 2.11BSD
-        uses: docker/build-push-action@v6
-        with:
-          target: pdp11-2.11bsd
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd:${{ github.ref_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Push 2.11BSD
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     target: pdp11-2.11bsd
+      #     push: true
+      #     tags: |
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd:latest
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd:${{ github.ref_name }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
-      - name: Push 2.11BSD with httpd
-        uses: docker/build-push-action@v6
-        with:
-          target: pdp11-2.11bsd-httpd
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd-httpd:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd-httpd:${{ github.ref_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      # - name: Push 2.11BSD with httpd
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     target: pdp11-2.11bsd-httpd
+      #     push: true
+      #     tags: |
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd-httpd:latest
+      #       ${{ secrets.DOCKERHUB_USERNAME }}/pdp11-2.11bsd-httpd:${{ github.ref_name }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
 
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ github.ref_name }}
         run: |
+          envsubst < docker-images.md > "$TEMP/docker-images.md"
+
           version="${{ github.ref_name }}"
           version="${version#v}"
           gh release create "${{ github.ref_name }}" \
             --title "Docker Images ${version}" \
             --draft \
             --generate-notes \
+            --notes-file "$TEMP/docker-images.md" \
             --verify-tag
