@@ -74,9 +74,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $version = "${{ github.ref_name }}" -Replace "^v", ""
-          gh release create "${{ github.ref_name }}" `
-            --title "Docker Images ${version}" `
-            --draft `
-            --generate-notes `
+          version="${{ github.ref_name }}"
+          version="${version#v}"
+          gh release create "${{ github.ref_name }}" \
+            --title "Docker Images ${version}" \
+            --draft \
+            --generate-notes \
             --verify-tag
