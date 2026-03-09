@@ -26,28 +26,28 @@ jobs:
         run: make lint
 
       - name: Build PDP11
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           target: pdp11
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Build Unix v6
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           target: pdp11-unix-v6
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Build 2.11BSD
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           target: pdp11-2.11bsd
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Build 2.11BSD with httpd
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           target: pdp11-2.11bsd-httpd
           cache-from: type=gha
