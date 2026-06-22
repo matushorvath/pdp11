@@ -12,7 +12,7 @@ RUN apt-get update \
 
 WORKDIR /usr/src/simh
 
-ADD https://github.com/open-simh/simh.git#6e9324e09f4f364346310de34849077c986c29f2 .
+ADD https://github.com/open-simh/simh.git#0dc9decac98fc99c8db9722cd5d941b9e73ac67b .
 
 RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --notest \
     && mkdir -p /opt/pdp11 \
