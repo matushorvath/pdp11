@@ -1,7 +1,7 @@
 2.11BSD Tape
 ============
 
-https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/  
+https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD-patch481/  
 https://github.com/eunuchs/unix-archive/blob/master/PDP-11/Documentation/PUPS_Html/Setup/2.11bsd_setup.txt  
 
 Swap panic
