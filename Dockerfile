@@ -51,23 +51,23 @@ FROM build-pdp11 AS build-pdp11-2.11bsd
 
 WORKDIR /opt/pdp11
 
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/482 482.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/483 483.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/484 484.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/485 485.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/486 486.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/487 487.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/488 488.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/489 489.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/490 490.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/491 491.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/492 492.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/494 494.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/495 495.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/496 496.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/497 497.txt
-ADD https://www.tuhs.org/Archive/Distributions/UCB/2.11BSD/Patches/498 498.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/482 482.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/483 483.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/484 484.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/485 485.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/486 486.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/487 487.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/488 488.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/489 489.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/490 490.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/491 491.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/492 492.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/494 494.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/495 495.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/496 496.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/497 497.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/498 498.txt
 
 COPY 2.11bsd/data/Makefile.patch data/
 COPY 2.11bsd/data/SIMH data/
