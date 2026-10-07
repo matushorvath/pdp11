@@ -64,6 +64,7 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/489 489.
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/490 490.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/491 491.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/492 492.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/493 493.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/494 494.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/495 495.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/496 496.txt
@@ -73,6 +74,7 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/498 498.
 COPY 2.11bsd/data/Makefile.patch data/
 COPY 2.11bsd/data/SIMH data/
 COPY 2.11bsd/data/fstab data/
+COPY 2.11bsd/data/fix-482.patch data/
 COPY 2.11bsd/data/rc.patch data/
 COPY 2.11bsd/data/parse-patches.sh .
 

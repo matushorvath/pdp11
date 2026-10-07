@@ -46,6 +46,10 @@ printf '#!/bin/sh -v\n\n' > data/492.sh
 sed -n '123,141p' < 492.txt >> data/492.sh
 sed -n '152,$p' < 492.txt > data/492.patch
 
+printf '#!/bin/sh -v\n\n' > data/493.sh
+sed -n '73,79p' < 493.txt >> data/493.sh
+sed -n '119,$p' < 493.txt > data/493.patch
+
 printf '#!/bin/sh -v\n\n' > data/494.sh
 sed -n '32,34p' < 494.txt >> data/494.sh
 sed -n '48,$p' < 494.txt > data/494.patch
@@ -65,6 +69,7 @@ sed -n '69,$p' < 497.txt > data/497.patch
 
 printf '#!/bin/sh -v\n\n' > data/498.sh
 sed -n '109,138p' < 498.txt >> data/498.sh
+sed -i 's/YOUR_KERNEL_BUILD_DIRECTORY/SIMH/g' data/498.sh
 sed -n '149,$p' < 498.txt > data/498.patch
 
 chmod a+x data/*.sh
