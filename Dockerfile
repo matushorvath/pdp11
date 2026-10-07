@@ -79,6 +79,8 @@ COPY 2.11bsd/data/parse-patches.sh .
 RUN ./parse-patches.sh \
     && tar cvf data.tar data
 
+COPY 2.11bsd/simh/exec-bsd .
+
 COPY 2.11bsd/simh/install-tape.ini .
 RUN ["./pdp11", "install-tape.ini"]
 

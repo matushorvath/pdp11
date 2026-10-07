@@ -105,6 +105,23 @@ Patch Failures
 #59 19.80 1 out of 2 hunks failed--saving rejects to ./usr/src/sbin/dump/dump.h#
 ```
 
+***************
+*** 80,86 ****
+  /*
+   *	Exit status codes
+   */
+! #define	X_FINOK		1	/* normal exit */
+  #define	X_REWRITE	2	/* restart writing from the check point */
+  #define	X_ABORT		3	/* abort all of dump; don't attempt checkpointing*/
+  
+--- 80,86 ----
+  /*
+   *	Exit status codes
+   */
+! #define	X_FINOK		0	/* normal exit */
+  #define	X_REWRITE	2	/* restart writing from the check point */
+  #define	X_ABORT		3	/* abort all of dump; don't attempt checkpointing*/
+
 ```
 #59 52.26 # patch -p0 < /tmp/data/494.patch
 #59 52.36 Hmm...  Looks like a new-style context diff to me...
@@ -118,6 +135,47 @@ Patch Failures
 #59 52.47 Hunk #2 failed at 373.
 #59 52.62 2 out of 2 hunks failed--saving rejects to ./usr/src/sys/pdpuba/dz.c#
 ```
+
+*** ./usr/src/sys/pdpuba/dz.c.old	Tue Aug 12 18:39:14 2025
+--- ./usr/src/sys/pdpuba/dz.c	Wed Aug 13 06:07:16 2025
+***************
+*** 3,9 ****
+   * All rights reserved.  The Berkeley software License Agreement
+   * specifies the terms and conditions for redistribution.
+   *
+!  *	@(#)dz.c	1.6 (2.11BSD) 2025/8/11
+   */
+  
+  /*
+--- 3,9 ----
+   * All rights reserved.  The Berkeley software License Agreement
+   * specifies the terms and conditions for redistribution.
+   *
+!  *	@(#)dz.c	1.7 (2.11BSD) 2025/8/13
+   */
+  
+  /*
+***************
+*** 373,381 ****
+  		return;
+  	}
+  	lpr = (dz_speeds[tp->t_ispeed]<<8) | (unit & 07);
+! 	if ((tp->t_flags & (EVENP|ODDP) == ODDP)
+  		lpr |= PENABLE|OPAR;
+! 	else if ((tp->t_flags & (EVENP|ODDP) == EVENP)
+  		lpr |= PENABLE;
+  	if ((tp->t_flags & (RAW|LITOUT|PASS8)) || !(lpr & PENABLE))
+  		lpr |= BITS8;
+--- 373,381 ----
+  		return;
+  	}
+  	lpr = (dz_speeds[tp->t_ispeed]<<8) | (unit & 07);
+! 	if ((tp->t_flags & (EVENP|ODDP)) == ODDP)
+  		lpr |= PENABLE|OPAR;
+! 	else if ((tp->t_flags & (EVENP|ODDP)) == EVENP)
+  		lpr |= PENABLE;
+  	if ((tp->t_flags & (RAW|LITOUT|PASS8)) || !(lpr & PENABLE))
+  		lpr |= BITS8;
 
 One of the patches suggests we rebuild the kernel.
 Multiple errors reported during userspace builds, but some may be expected.
