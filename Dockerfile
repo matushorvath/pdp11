@@ -12,7 +12,8 @@ RUN apt-get update \
 
 WORKDIR /usr/src/simh
 
-ADD https://github.com/open-simh/simh.git#0dc9decac98fc99c8db9722cd5d941b9e73ac67b .
+# master branch on Oct 7, 2026
+ADD https://github.com/open-simh/simh.git#87eb7d5e96f9ce0ee6ac183e20160e5c486b0712 .
 
 RUN cmake/cmake-builder.sh --flavor unix --target pdp11 --novideo --notest \
     && mkdir -p /opt/pdp11 \
