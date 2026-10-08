@@ -6,7 +6,7 @@ FROM debian:13.7-slim AS build-pdp11
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
-        libedit2 libedit-dev libpcap0.8t64 libpcap0.8-dev libpcre2-posix3 libpcre2-dev \
+        libedit2 libedit-dev libpcap0.8t64 libpcap0.8-dev libpcre2-8-0 libpcre2-dev \
         pkg-config zlib1g zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -25,7 +25,7 @@ FROM gcr.io/distroless/base-nossl-debian13:nonroot AS pdp11
 
 WORKDIR /opt/pdp11
 
-COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libpcre2-posix.so.3 /lib/x86_64-linux-gnu/
+COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libedit.so.2 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libbsd.so.0 /lib/x86_64-linux-gnu/
