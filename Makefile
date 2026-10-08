@@ -27,4 +27,4 @@ run: run-2.11bsd-httpd
 
 .PHONY: run-2.11bsd-httpd
 run-2.11bsd-httpd:
-	docker run -it matushorvath/pdp11-2.11bsd-httpd
+	docker run -it -p 8080:80 matushorvath/pdp11-2.11bsd-httpd
