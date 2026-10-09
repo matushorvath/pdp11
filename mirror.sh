@@ -2,7 +2,8 @@
 
 # Mirror files from tuhs.org
 
-BASE=https://www.tuhs.org/Archive/Distributions/
+BASEURL=https://www.tuhs.org/Archive/Distributions
+BASEDIR=mirror
 
 URLS='
 Other/OS_Course/v6/dist.tap
@@ -29,6 +30,8 @@ UCB/2BSD/2.11BSD/Patches/499
 
 echo "$URLS" | while read -r path; do
     [ -z "$path" ] && continue
-    mkdir -p "$(dirname "$path")"
-    [ -s "$path" ] || wget -O "$path" "$BASE$path" </dev/null
+    mkdir -p "$(dirname "$BASEDIR/$path")"
+    wget -O "$BASEDIR/$path" "$BASEURL/$path" </dev/null
 done
+
+find "$BASEDIR" -type f ! -name SHA256SUMS -exec sha256sum {} + > SHA256SUMS
