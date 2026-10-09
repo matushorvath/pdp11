@@ -6,3 +6,4 @@ Publish
   - Tag creates a release like in shadow-kvm
   - Publishing a release triggers actions to publish to GitHub
 - Add tests to verify the image works when building a PR
+- In parse-patches.sh we should add /bin/sh -ve to BSD shell scripts
