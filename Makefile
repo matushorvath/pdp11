@@ -2,7 +2,7 @@
 build: unix-v6 2.11bsd 2.11bsd-httpd
 
 .PHONY: pdp11
-pdp11: lint
+pdp11: check
 	docker build -t matushorvath/pdp11 --target pdp11 .
 
 .PHONY: unix-v6
@@ -17,10 +17,17 @@ unix-v6: pdp11
 2.11bsd-httpd: 2.11bsd
 	docker build -t matushorvath/pdp11-2.11bsd-httpd --target pdp11-2.11bsd-httpd .
 
+.PHONY: check
+check: lint checksum-mirror
+
 .PHONY: lint
 lint:
 	yamllint .
 	docker run --rm -i hadolint/hadolint hadolint - < Dockerfile
+
+.PHONY: checksum-mirror
+checksum-mirror:
+	sha256sum -c SHA256SUMS
 
 .PHONY: run
 run: run-2.11bsd-httpd
