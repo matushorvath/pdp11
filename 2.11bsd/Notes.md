@@ -85,97 +85,10 @@ pdp11-2.11bsd-httpd:patch-482.v1
 pdp11-2.11bsd-httpd:patch-482
 pdp11-2.11bsd-httpd:latest
 
-pdp11-2.11bsd-gcc:<sha>
-pdp11-2.11bsd-gcc:patch-482.v1
-pdp11-2.11bsd-gcc:patch-482
-pdp11-2.11bsd-gcc:latest
-
 Patch Failures
 ==============
 
-```
-#59 19.05 # patch -p0 < /tmp/data/482.patch
-...
-#59 19.73 |*** ./usr/src/sbin/dump/dump.h.old     Tue Dec  6 23:48:31 1994
-#59 19.73 |--- ./usr/src/sbin/dump/dump.h Wed Sep 18 19:11:17 2024
-#59 19.73 --------------------------
-#59 19.75 Patching file ./usr/src/sbin/dump/dump.h using Plan A...
-#59 19.75 Hunk #1 succeeded at 1.
-#59 19.76 Hunk #2 failed at 80.
-#59 19.80 1 out of 2 hunks failed--saving rejects to ./usr/src/sbin/dump/dump.h#
-```
+Fixed:
+- 482: /usr/src/sbin/dump/dump.h
 
-***************
-*** 80,86 ****
-  /*
-   *	Exit status codes
-   */
-! #define	X_FINOK		1	/* normal exit */
-  #define	X_REWRITE	2	/* restart writing from the check point */
-  #define	X_ABORT		3	/* abort all of dump; don't attempt checkpointing*/
-  
---- 80,86 ----
-  /*
-   *	Exit status codes
-   */
-! #define	X_FINOK		0	/* normal exit */
-  #define	X_REWRITE	2	/* restart writing from the check point */
-  #define	X_ABORT		3	/* abort all of dump; don't attempt checkpointing*/
-
-```
-#59 52.26 # patch -p0 < /tmp/data/494.patch
-#59 52.36 Hmm...  Looks like a new-style context diff to me...
-#59 52.38 The text leading up to this was:
-#59 52.38 --------------------------
-#59 52.38 |*** ./usr/src/sys/pdpuba/dz.c.old      Tue Aug 12 18:39:14 2025
-#59 52.39 |--- ./usr/src/sys/pdpuba/dz.c  Wed Aug 13 06:07:16 2025
-#59 52.39 --------------------------
-#59 52.42 Patching file ./usr/src/sys/pdpuba/dz.c using Plan A...
-#59 52.46 Hunk #1 failed at 3.
-#59 52.47 Hunk #2 failed at 373.
-#59 52.62 2 out of 2 hunks failed--saving rejects to ./usr/src/sys/pdpuba/dz.c#
-```
-
-*** ./usr/src/sys/pdpuba/dz.c.old	Tue Aug 12 18:39:14 2025
---- ./usr/src/sys/pdpuba/dz.c	Wed Aug 13 06:07:16 2025
-***************
-*** 3,9 ****
-   * All rights reserved.  The Berkeley software License Agreement
-   * specifies the terms and conditions for redistribution.
-   *
-!  *	@(#)dz.c	1.6 (2.11BSD) 2025/8/11
-   */
-  
-  /*
---- 3,9 ----
-   * All rights reserved.  The Berkeley software License Agreement
-   * specifies the terms and conditions for redistribution.
-   *
-!  *	@(#)dz.c	1.7 (2.11BSD) 2025/8/13
-   */
-  
-  /*
-***************
-*** 373,381 ****
-  		return;
-  	}
-  	lpr = (dz_speeds[tp->t_ispeed]<<8) | (unit & 07);
-! 	if ((tp->t_flags & (EVENP|ODDP) == ODDP)
-  		lpr |= PENABLE|OPAR;
-! 	else if ((tp->t_flags & (EVENP|ODDP) == EVENP)
-  		lpr |= PENABLE;
-  	if ((tp->t_flags & (RAW|LITOUT|PASS8)) || !(lpr & PENABLE))
-  		lpr |= BITS8;
---- 373,381 ----
-  		return;
-  	}
-  	lpr = (dz_speeds[tp->t_ispeed]<<8) | (unit & 07);
-! 	if ((tp->t_flags & (EVENP|ODDP)) == ODDP)
-  		lpr |= PENABLE|OPAR;
-! 	else if ((tp->t_flags & (EVENP|ODDP)) == EVENP)
-  		lpr |= PENABLE;
-  	if ((tp->t_flags & (RAW|LITOUT|PASS8)) || !(lpr & PENABLE))
-  		lpr |= BITS8;
-
-One of the patches suggests we rebuild the kernel.
 Multiple errors reported during userspace builds, but some may be expected.
