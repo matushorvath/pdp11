@@ -6,7 +6,7 @@ FROM debian:13.7-slim AS build-pdp11
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential cmake cmake-data \
-        libedit2 libedit-dev libpcap0.8t64 libpcap0.8-dev libpcre2-posix3 libpcre2-dev \
+        libedit2 libedit-dev libpcap0.8t64 libpcap0.8-dev libpcre2-8-0 libpcre2-dev \
         pkg-config zlib1g zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -25,7 +25,7 @@ FROM gcr.io/distroless/base-nossl-debian13:nonroot AS pdp11
 
 WORKDIR /opt/pdp11
 
-COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libpcre2-posix.so.3 /lib/x86_64-linux-gnu/
+COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libpcre2-8.so.0 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libedit.so.2 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libtinfo.so.6 /lib/x86_64-linux-gnu/
 COPY --from=build-pdp11 /lib/x86_64-linux-gnu/libbsd.so.0 /lib/x86_64-linux-gnu/
@@ -64,6 +64,7 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/489 489.
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/490 490.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/491 491.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/492 492.txt
+ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/493 493.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/494 494.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/495 495.txt
 ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/496 496.txt
@@ -73,11 +74,14 @@ ADD https://www.tuhs.org/Archive/Distributions/UCB/2BSD/2.11BSD/Patches/498 498.
 COPY 2.11bsd/data/Makefile.patch data/
 COPY 2.11bsd/data/SIMH data/
 COPY 2.11bsd/data/fstab data/
+COPY 2.11bsd/data/fix-482.patch data/
 COPY 2.11bsd/data/rc.patch data/
 COPY 2.11bsd/data/parse-patches.sh .
 
 RUN ./parse-patches.sh \
     && tar cvf data.tar data
+
+COPY 2.11bsd/simh/exec-bsd .
 
 COPY 2.11bsd/simh/install-tape.ini .
 RUN ["./pdp11", "install-tape.ini"]

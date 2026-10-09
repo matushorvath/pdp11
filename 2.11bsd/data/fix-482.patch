@@ -1,0 +1,18 @@
+*** ./usr/src/sbin/dump/dump.h.old	Tue Dec  6 23:48:31 1994
+--- ./usr/src/sbin/dump/dump.h	Wed Sep 18 19:11:17 2024
+***************
+*** 80,86 ****
+  /*
+   *	Exit status codes
+   */
+! #define	X_FINOK		0	/* normal exit */
+  #define	X_REWRITE	2	/* restart writing from the check point */
+  #define	X_ABORT		3	/* abort all of dump; don't attempt checkpointing*/
+  
+--- 80,86 ----
+  /*
+   *	Exit status codes
+   */
+! #define	X_FINOK		1	/* normal exit */
+  #define	X_REWRITE	2	/* restart writing from the check point */
+  #define	X_ABORT		3	/* abort all of dump; don't attempt checkpointing*/
