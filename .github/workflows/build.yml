@@ -34,6 +34,7 @@ jobs:
       - name: Build PDP11
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11
           no-cache: ${{ inputs.no_cache || false }}
           cache-from: type=gha
@@ -42,6 +43,7 @@ jobs:
       - name: Build Unix v6
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11-unix-v6
           no-cache: ${{ inputs.no_cache || false }}
           cache-from: type=gha
@@ -50,6 +52,7 @@ jobs:
       - name: Build 2.11BSD
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11-2.11bsd
           no-cache: ${{ inputs.no_cache || false }}
           cache-from: type=gha
@@ -58,6 +61,7 @@ jobs:
       - name: Build 2.11BSD with httpd
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11-2.11bsd-httpd
           no-cache: ${{ inputs.no_cache || false }}
           cache-from: type=gha

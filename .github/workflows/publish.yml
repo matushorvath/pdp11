@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          lfs: true
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -32,6 +34,7 @@ jobs:
       - name: Push PDP11
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11
           push: true
           tags: |
@@ -43,6 +46,7 @@ jobs:
       - name: Push Unix v6
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11-unix-v6
           push: true
           tags: |
@@ -54,6 +58,7 @@ jobs:
       - name: Push 2.11BSD
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11-2.11bsd
           push: true
           tags: |
@@ -65,6 +70,7 @@ jobs:
       - name: Push 2.11BSD with httpd
         uses: docker/build-push-action@v7
         with:
+          context: . # to make git-lfs work
           target: pdp11-2.11bsd-httpd
           push: true
           tags: |
