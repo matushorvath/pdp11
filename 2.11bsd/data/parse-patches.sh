@@ -72,4 +72,17 @@ sed -n '109,138p' < 498.txt >> data/498.sh
 sed -i 's/YOUR_KERNEL_BUILD_DIRECTORY/SIMH/g' data/498.sh
 sed -n '149,$p' < 498.txt > data/498.patch
 
+printf '#!/bin/sh -ve\n\n' > data/499.sh
+sed -n '367,380p;403,409p;412,415p;419,423p;426,429p' < 499.txt >> data/499.sh
+sed -n '448,$p' < 499.txt > data/499.shar
+
+# /usr/src/games/warp/Makefile doesn't exist, but 499.shar tries to patch it
+# workaround by removing corresponding part of the patch
+sed -i '11048,11070d' data/499.shar
+
+# /etc/disktab is installed from /usr/src/etc/disktab, before make install
+# it contains an older version that fails the patch
+# instead we just patch /usr/src/etc/disktab and later make install it
+sed -i '4836,4931d' data/499.shar
+
 chmod a+x data/*.sh
