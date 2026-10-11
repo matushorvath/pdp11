@@ -45,7 +45,7 @@ PDP11		93
 #########################################
 
 IDENT		SIMH			# machine name
-MAXUSERS	8			# maxusers on machine
+MAXUSERS	4			# maxusers on machine
 
 # BOOTDEV is the letter combination denoting the autoboot device,
 # or NONE if not using the autoboot feature.

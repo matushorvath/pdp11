@@ -48,11 +48,32 @@ ENTRYPOINT ["./pdp11"]
 
 ####################
 # Build DEC PDP11 with 2.11BSD on Open SimH
-FROM build-pdp11 AS build-pdp11-2.11bsd
+FROM build-pdp11 AS build-pdp11-2.11bsd-tape
 
 WORKDIR /opt/pdp11
 
 COPY mirror/UCB/2BSD/2.11BSD-patch481/2.11BSD-481-simh-dist.tap 2.11bsd.tap
+
+COPY 2.11bsd/data/fstab data/
+COPY 2.11bsd/data/rc.patch data/
+RUN tar cvf data.tar data
+
+COPY 2.11bsd/simh/exec-bsd .
+
+COPY 2.11bsd/simh/install-tape-root.ini .
+RUN ["./pdp11", "install-tape-root.ini"]
+
+COPY 2.11bsd/simh/install-tape-usr.ini .
+RUN ["./pdp11", "install-tape-usr.ini"]
+
+####################
+# Build DEC PDP11 with 2.11BSD on Open SimH
+FROM build-pdp11 AS build-pdp11-2.11bsd
+
+WORKDIR /opt/pdp11
+
+COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-tape /opt/pdp11/rq0.dsk .
+
 COPY mirror/UCB/2BSD/2.11BSD/Patches/482 482.txt
 COPY mirror/UCB/2BSD/2.11BSD/Patches/483 483.txt
 COPY mirror/UCB/2BSD/2.11BSD/Patches/484 484.txt
@@ -74,24 +95,19 @@ COPY mirror/UCB/2BSD/2.11BSD/Patches/499 499.txt
 
 COPY 2.11bsd/data/Makefile.patch data/
 COPY 2.11bsd/data/SIMH data/
-COPY 2.11bsd/data/fstab data/
 COPY 2.11bsd/data/fix-482.patch data/
-COPY 2.11bsd/data/rc.patch data/
-COPY 2.11bsd/data/parse-patches.sh .
 
+COPY 2.11bsd/data/parse-patches.sh .
 RUN ./parse-patches.sh \
     && tar cvf data.tar data
 
 COPY 2.11bsd/simh/exec-bsd .
 
-COPY 2.11bsd/simh/install-tape.ini .
-RUN ["./pdp11", "install-tape.ini"]
+COPY 2.11bsd/simh/install-kernel.ini .
+RUN ["./pdp11", "install-kernel.ini"]
 
-COPY 2.11bsd/simh/install-file-system.ini .
-RUN ["./pdp11", "install-file-system.ini"]
-
-COPY 2.11bsd/simh/install-rebuild.ini .
-RUN ["./pdp11", "install-rebuild.ini"]
+COPY 2.11bsd/simh/install-patch.ini .
+RUN ["./pdp11", "install-patch.ini"]
 
 COPY 2.11bsd/simh/install-config.ini .
 RUN ["./pdp11", "install-config.ini"]
