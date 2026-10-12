@@ -103,6 +103,7 @@ RUN ./parse-patches.sh \
 
 COPY 2.11bsd/simh/exec-bsd .
 
+# Rebuilding userspace will fail without increasing MAXUSERS in the kernel
 COPY 2.11bsd/simh/install-kernel.ini .
 RUN ["./pdp11", "install-kernel.ini"]
 
