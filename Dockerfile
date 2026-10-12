@@ -47,7 +47,7 @@ COPY --chown=nonroot:nonroot mirror/Other/OS_Course/v6/dist.tap .
 ENTRYPOINT ["./pdp11"]
 
 ####################
-# Build DEC PDP11 with 2.11BSD on Open SimH
+# Build DEC PDP11 with 2.11BSD on Open SimH (load data from tape)
 FROM build-pdp11 AS build-pdp11-2.11bsd-tape
 
 WORKDIR /opt/pdp11
@@ -67,12 +67,33 @@ COPY 2.11bsd/simh/install-tape-usr.ini .
 RUN ["./pdp11", "install-tape-usr.ini"]
 
 ####################
-# Build DEC PDP11 with 2.11BSD on Open SimH
-FROM build-pdp11 AS build-pdp11-2.11bsd
+# Build DEC PDP11 with 2.11BSD on Open SimH (configure)
+FROM build-pdp11 AS build-pdp11-2.11bsd-config
 
 WORKDIR /opt/pdp11
 
 COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-tape /opt/pdp11/rq0.dsk .
+
+COPY 2.11bsd/data/Makefile.patch data/
+COPY 2.11bsd/data/SIMH data/
+RUN tar cvf data.tar data
+
+COPY 2.11bsd/simh/exec-bsd .
+
+COPY 2.11bsd/simh/install-config.ini .
+RUN ["./pdp11", "install-config.ini"]
+
+# Rebuilding userspace will fail later, unless we first increase MAXUSERS in the kernel and reboot
+COPY 2.11bsd/simh/install-build-kernel.ini .
+RUN ["./pdp11", "install-build-kernel.ini"]
+
+####################
+# Build DEC PDP11 with 2.11BSD on Open SimH (patch and rebuild)
+FROM build-pdp11 AS build-pdp11-2.11bsd
+
+WORKDIR /opt/pdp11
+
+COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-config /opt/pdp11/rq0.dsk .
 
 COPY mirror/UCB/2BSD/2.11BSD/Patches/482 482.txt
 COPY mirror/UCB/2BSD/2.11BSD/Patches/483 483.txt
@@ -103,15 +124,14 @@ RUN ./parse-patches.sh \
 
 COPY 2.11bsd/simh/exec-bsd .
 
-# Rebuilding userspace will fail without increasing MAXUSERS in the kernel
-COPY 2.11bsd/simh/install-kernel.ini .
-RUN ["./pdp11", "install-kernel.ini"]
-
 COPY 2.11bsd/simh/install-patch.ini .
 RUN ["./pdp11", "install-patch.ini"]
 
-COPY 2.11bsd/simh/install-config.ini .
-RUN ["./pdp11", "install-config.ini"]
+COPY 2.11bsd/simh/install-build-userspace.ini .
+RUN ["./pdp11", "install-build-userspace.ini"]
+
+COPY 2.11bsd/simh/install-build-kernel.ini .
+RUN ["./pdp11", "install-build-kernel.ini"]
 
 ####################
 # DEC PDP11 with 2.11BSD on Open SimH

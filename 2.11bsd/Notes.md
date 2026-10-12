@@ -92,9 +92,9 @@ Fixed:
 - 482: /usr/src/sbin/dump/dump.h
 
 Worked around:
-- 499: File /usr/src/games/warp/Makefile doesn't exist unless you have run /usr/src/games/warp/Configure,
-  but it's being patched.
-  Fix: Most likely /usr/src/games/warp/Makefile.SH should be patched instead of Makefile.
+- 499: File /usr/src/games/warp/Makefile doesn't exist unless you run sh Makefile.SH, but it's being patched.
+  Workaround: Remove that part of the patch, remove warp from /usr/src/games/Makefile.
+  Fix: Most likely /usr/src/games/warp/Makefile.SH should be patched instead and executed before rebuilding.
 - 499: Patch 482 updates /usr/src/etc/disktab but not /etc/disktab. Patch 499 updates both, and expects
   /etc/disktab to be already updated from 482 /usr/src/etc/disktab. We skip patching /etc/disktab in 499,
   just patch /usr/src/etc/disktab. It should later be copied into /etc/disktab (manually).
