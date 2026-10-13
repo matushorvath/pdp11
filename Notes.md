@@ -11,8 +11,7 @@ TODO
 ----
 
 - Add tests to verify the image works when building a PR
-- In parse-patches.sh we should add /bin/sh -ve to BSD shell scripts
-- Don't rename patches from e.g. 499 to 499.txt
+- In parse-patches.sh add /bin/sh -ve to BSD shell scripts where possible
 - Error checking for unix-v6
 - https://www.tuhs.org/Archive/Distributions/Research/Utah_v4/
 - https://www.tuhs.org/Archive/Distributions/DEC/

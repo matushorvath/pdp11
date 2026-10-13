@@ -88,34 +88,32 @@ COPY 2.11bsd/simh/install-build-kernel.ini .
 RUN ["./pdp11", "install-build-kernel.ini"]
 
 ####################
-# Build DEC PDP11 with 2.11BSD on Open SimH (patch and rebuild)
-FROM build-pdp11 AS build-pdp11-2.11bsd
+# Build DEC PDP11 with 2.11BSD on Open SimH (patch)
+FROM build-pdp11 AS build-pdp11-2.11bsd-patch
 
 WORKDIR /opt/pdp11
 
 COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-config /opt/pdp11/rq0.dsk .
 
-COPY mirror/UCB/2BSD/2.11BSD/Patches/482 482.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/483 483.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/484 484.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/485 485.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/486 486.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/487 487.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/488 488.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/489 489.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/490 490.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/491 491.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/492 492.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/493 493.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/494 494.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/495 495.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/496 496.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/497 497.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/498 498.txt
-COPY mirror/UCB/2BSD/2.11BSD/Patches/499 499.txt
+COPY mirror/UCB/2BSD/2.11BSD/Patches/482 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/483 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/484 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/485 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/486 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/487 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/488 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/489 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/490 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/491 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/492 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/493 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/494 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/495 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/496 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/497 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/498 .
+COPY mirror/UCB/2BSD/2.11BSD/Patches/499 .
 
-COPY 2.11bsd/data/Makefile.patch data/
-COPY 2.11bsd/data/SIMH data/
 COPY 2.11bsd/data/fix-482.patch data/
 
 COPY 2.11bsd/data/parse-patches.sh .
@@ -126,6 +124,20 @@ COPY 2.11bsd/simh/exec-bsd .
 
 COPY 2.11bsd/simh/install-patch.ini .
 RUN ["./pdp11", "install-patch.ini"]
+
+####################
+# Build DEC PDP11 with 2.11BSD on Open SimH (rebuild)
+FROM build-pdp11 AS build-pdp11-2.11bsd
+
+WORKDIR /opt/pdp11
+
+COPY --chown=nonroot:nonroot --from=build-pdp11-2.11bsd-patch /opt/pdp11/rq0.dsk .
+
+COPY 2.11bsd/data/Makefile.patch data/
+COPY 2.11bsd/data/SIMH data/
+RUN tar cvf data.tar data
+
+COPY 2.11bsd/simh/exec-bsd .
 
 COPY 2.11bsd/simh/install-build-userspace.ini .
 RUN ["./pdp11", "install-build-userspace.ini"]
